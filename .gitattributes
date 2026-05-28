@@ -1,4 +1,4 @@
-# Set the default behavior, in case people don't have core.autocrlf set.
+﻿# Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
 
 # Explicitly specify line endings for as many files as possible.
@@ -37,5 +37,3 @@ LICENSE text eol=lf
 Makefile text eol=lf
 README text eol=lf
 TRADEMARK text eol=lf
-
-# Use CRLF for Windows-specific file types
