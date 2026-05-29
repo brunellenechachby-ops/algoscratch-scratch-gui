@@ -764,7 +764,7 @@ const getAlgoScratchActivity = function () {
     const activity = params.get('activity');
     const mode = params.get('mode');
     if (!activity || mode === 'full') return null;
-    if (!['activite-1', 'activite-2', 'activite-3'].includes(activity)) return null;
+    if (!['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6'].includes(activity)) return null;
     return activity;
 };
 
@@ -772,7 +772,7 @@ const isAlgoScratchSimpleMode = function () {
     return Boolean(getAlgoScratchActivity());
 };
 
-const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected) {
+const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, targetId) {
     if (isStage) {
         return `<label text="${stageSelected}"></label>`;
     }
@@ -781,6 +781,13 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected) {
         <block type="motion_movesteps">
             <value name="STEPS">
                 <shadow type="math_number"><field name="NUM">50</field></shadow>
+            </value>
+        </block>`;
+
+    const smallMoveBlock = `
+        <block type="motion_movesteps">
+            <value name="STEPS">
+                <shadow type="math_number"><field name="NUM">10</field></shadow>
             </value>
         </block>`;
 
@@ -811,15 +818,87 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected) {
     const turnLeftBlock = `
         <block type="motion_turnleft">
             <value name="DEGREES">
-                <shadow type="math_number"><field name="NUM">90</field></shadow>
+                <shadow type="math_number"><field name="NUM">45</field></shadow>
             </value>
         </block>`;
+
+    const xPositionBlock = targetId ? `
+        <block id="${targetId}_xposition" type="motion_xposition"/>` : '';
 
     if (activity === 'activite-3') {
         return `${moveBlock}${turnRightBlock}${turnLeftBlock}`;
     }
 
+    if (activity === 'activite-4') {
+        return `${gotoBlock}${pointBlock}${smallMoveBlock}`;
+    }
+
+    if (activity === 'activite-5') {
+        return `${moveBlock}${turnLeftBlock}`;
+    }
+
+    if (activity === 'activite-6') {
+        return `${gotoBlock}${pointBlock}${smallMoveBlock}${xPositionBlock}`;
+    }
+
     return `${gotoBlock}${pointBlock}${moveBlock}`;
+};
+
+const penBlocksForAlgoScratch = function (activity) {
+    const baseBlocks = `
+        <block type="pen_clear"/>
+        <block type="pen_penDown"/>
+        <block type="pen_penUp"/>`;
+
+    if (activity === 'activite-5') {
+        return `${baseBlocks}
+        <block type="pen_changePenColorParamBy">
+            <value name="VALUE">
+                <shadow type="math_number"><field name="NUM">10</field></shadow>
+            </value>
+        </block>`;
+    }
+
+    if (activity === 'activite-6') {
+        return `${baseBlocks}
+        <block type="pen_setPenColorToColor">
+            <value name="COLOR">
+                <shadow type="colour_picker"><field name="COLOUR">#0057ff</field></shadow>
+            </value>
+        </block>`;
+    }
+
+    return baseBlocks;
+};
+
+const controlBlocksForAlgoScratch = function (activity) {
+    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : 10;
+    const repeatBlock = ['activite-4', 'activite-5', 'activite-6'].includes(activity) ? `
+        <block type="control_repeat">
+            <value name="TIMES">
+                <shadow type="math_whole_number"><field name="NUM">${repeatDefault}</field></shadow>
+            </value>
+        </block>` : '';
+
+    return `${repeatBlock}
+        <block type="control_wait">
+            <value name="DURATION">
+                <shadow type="math_positive_number"><field name="NUM">1</field></shadow>
+            </value>
+        </block>`;
+};
+
+const looksCategoryForAlgoScratch = function (activity, isStage, colors) {
+    if (activity !== 'activite-6' || isStage) return '';
+
+    return `${categorySeparator}
+    <category name="%{BKY_CATEGORY_LOOKS}" id="looks" colour="${colors.looks.primary}" secondaryColour="${colors.looks.tertiary}">
+        <block type="looks_say">
+            <value name="MESSAGE">
+                <shadow type="text"><field name="TEXT">abscisse x</field></shadow>
+            </value>
+        </block>
+    </category>`;
 };
 
 const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
@@ -838,27 +917,24 @@ const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
         categorySeparator,
         `
     <category name="%{BKY_CATEGORY_MOTION}" id="motion" colour="${colors.motion.primary}" secondaryColour="${colors.motion.tertiary}">
-        ${motionBlocksForAlgoScratch(activity, isStage, stageSelected)}
+        ${motionBlocksForAlgoScratch(activity, isStage, stageSelected, targetId)}
     </category>`,
         categorySeparator,
         `
     <category name="Stylo" id="pen" colour="${colors.pen.primary}" secondaryColour="${colors.pen.tertiary}">
-        <block type="pen_clear"/>
-        <block type="pen_penDown"/>
-        <block type="pen_penUp"/>
+        ${penBlocksForAlgoScratch(activity)}
     </category>`,
         categorySeparator,
         `
     <category name="%{BKY_CATEGORY_CONTROL}" id="control" colour="${colors.control.primary}" secondaryColour="${colors.control.tertiary}">
-        <block type="control_wait">
-            <value name="DURATION">
-                <shadow type="math_positive_number"><field name="NUM">1</field></shadow>
-            </value>
-        </block>
+        ${controlBlocksForAlgoScratch(activity)}
     </category>`,
+        looksCategoryForAlgoScratch(activity, isStage, colors),
         xmlClose
     ].join('\n');
-};const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categoriesXML = [],
+};
+
+const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categoriesXML = [],
     costumeName = '', backdropName = '', soundName = '', colors = defaultColors) {
     isStage = isInitialSetup || isStage;
     if (isAlgoScratchSimpleMode()) {
