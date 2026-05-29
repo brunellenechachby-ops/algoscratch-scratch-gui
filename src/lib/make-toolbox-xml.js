@@ -764,7 +764,7 @@ const getAlgoScratchActivity = function () {
     const activity = params.get('activity');
     const mode = params.get('mode');
     if (!activity || mode === 'full') return null;
-    if (!['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6'].includes(activity)) return null;
+    if (!['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-8', 'activite-9', 'activite-10'].includes(activity)) return null;
     return activity;
 };
 
@@ -800,6 +800,18 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
                 <shadow type="math_number"><field name="NUM">0</field></shadow>
             </value>
         </block>`;
+
+    const mouseGotoBlock = `
+        <block type="motion_goto">
+            <value name="TO">
+                <shadow type="motion_goto_menu">
+                    <field name="TO">_mouse_</field>
+                </shadow>
+            </value>
+        </block>`;
+
+    const xPositionBlock = `<block id="${targetId}_xposition" type="motion_xposition"/>`;
+    const yPositionBlock = `<block id="${targetId}_yposition" type="motion_yposition"/>`;
 
     const pointBlock = `
         <block type="motion_pointindirection">
@@ -838,6 +850,18 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
         return `${gotoBlock}${pointBlock}${smallMoveBlock}`;
     }
 
+    if (activity === 'activite-7') {
+        return `${gotoBlock}${moveBlock}${turnLeftBlock}`;
+    }
+
+    if (activity === 'activite-8') {
+        return `${mouseGotoBlock}${xPositionBlock}${yPositionBlock}`;
+    }
+
+    if (activity === 'activite-9' || activity === 'activite-10') {
+        return `${gotoBlock}`;
+    }
+
     return `${gotoBlock}${pointBlock}${moveBlock}`;
 };
 
@@ -865,24 +889,55 @@ const penBlocksForAlgoScratch = function (activity) {
         </block>`;
     }
 
+    if (activity === 'activite-7') {
+        return `${baseBlocks}
+        <block type="pen_setPenSizeTo">
+            <value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        </block>
+        <block type="pen_changePenSizeBy">
+            <value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        </block>
+        <block type="pen_changePenColorParamBy">
+            <value name="VALUE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        </block>`;
+    }
+
     return baseBlocks;
 };
 
 const controlBlocksForAlgoScratch = function (activity) {
-    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : 10;
-    const repeatBlock = ['activite-4', 'activite-5', 'activite-6'].includes(activity) ? `
+    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : activity === 'activite-7' ? 80 : 10;
+    const repeatBlock = ['activite-4', 'activite-5', 'activite-6', 'activite-7'].includes(activity) ? `
         <block type="control_repeat">
             <value name="TIMES">
                 <shadow type="math_whole_number"><field name="NUM">${repeatDefault}</field></shadow>
             </value>
         </block>` : '';
 
-    return `${repeatBlock}
+    const foreverBlock = activity === 'activite-8' ? `
+        <block type="control_forever"/>` : '';
+
+    return `${repeatBlock}${foreverBlock}
         <block type="control_wait">
             <value name="DURATION">
                 <shadow type="math_positive_number"><field name="NUM">1</field></shadow>
             </value>
         </block>`;
+};
+
+const looksBlocksForAlgoScratch = function (activity, isStage) {
+    if (isStage || activity !== 'activite-8') return '';
+    return `
+    <category name="%{BKY_CATEGORY_LOOKS}" id="looks" colour="#9966FF" secondaryColour="#774DCB">
+        <block type="looks_sayforsecs">
+            <value name="MESSAGE"><shadow type="text"><field name="TEXT">abscisse x</field></shadow></value>
+            <value name="SECS"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        </block>
+        <block type="looks_sayforsecs">
+            <value name="MESSAGE"><shadow type="text"><field name="TEXT">ordonnee y</field></shadow></value>
+            <value name="SECS"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        </block>
+    </category>`;
 };
 
 
@@ -910,6 +965,8 @@ const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
         ${penBlocksForAlgoScratch(activity)}
     </category>`,
         categorySeparator,
+        looksBlocksForAlgoScratch(activity, isStage),
+        looksBlocksForAlgoScratch(activity, isStage) ? categorySeparator : '',
         `
     <category name="%{BKY_CATEGORY_CONTROL}" id="control" colour="${colors.control.primary}" secondaryColour="${colors.control.tertiary}">
         ${controlBlocksForAlgoScratch(activity)}
@@ -973,3 +1030,4 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
 };
 
 export default makeToolboxXML;
+
