@@ -2,8 +2,11 @@ import {STAGE_DISPLAY_SIZES} from '../lib/layout-constants.js';
 
 const SET_STAGE_SIZE = 'scratch-gui/StageSize/SET_STAGE_SIZE';
 
+const isAlgoScratchGuidedMode = typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('mode') === 'simple';
+
 const initialState = {
-    stageSize: STAGE_DISPLAY_SIZES.large
+    stageSize: isAlgoScratchGuidedMode ? STAGE_DISPLAY_SIZES.small : STAGE_DISPLAY_SIZES.large
 };
 
 const reducer = function (state, action) {
