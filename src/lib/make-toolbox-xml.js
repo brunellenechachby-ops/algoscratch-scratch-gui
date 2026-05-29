@@ -822,9 +822,6 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
             </value>
         </block>`;
 
-    const xPositionBlock = targetId ? `
-        <block id="${targetId}_xposition" type="motion_xposition"/>` : '';
-
     if (activity === 'activite-3') {
         return `${moveBlock}${turnRightBlock}${turnLeftBlock}`;
     }
@@ -838,7 +835,7 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
     }
 
     if (activity === 'activite-6') {
-        return `${gotoBlock}${pointBlock}${smallMoveBlock}${xPositionBlock}`;
+        return `${gotoBlock}${pointBlock}${smallMoveBlock}`;
     }
 
     return `${gotoBlock}${pointBlock}${moveBlock}`;
@@ -888,18 +885,6 @@ const controlBlocksForAlgoScratch = function (activity) {
         </block>`;
 };
 
-const looksCategoryForAlgoScratch = function (activity, isStage, colors) {
-    if (activity !== 'activite-6' || isStage) return '';
-
-    return `${categorySeparator}
-    <category name="%{BKY_CATEGORY_LOOKS}" id="looks" colour="${colors.looks.primary}" secondaryColour="${colors.looks.tertiary}">
-        <block type="looks_say">
-            <value name="MESSAGE">
-                <shadow type="text"><field name="TEXT">abscisse x</field></shadow>
-            </value>
-        </block>
-    </category>`;
-};
 
 const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
     const activity = getAlgoScratchActivity();
@@ -929,7 +914,6 @@ const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
     <category name="%{BKY_CATEGORY_CONTROL}" id="control" colour="${colors.control.primary}" secondaryColour="${colors.control.tertiary}">
         ${controlBlocksForAlgoScratch(activity)}
     </category>`,
-        looksCategoryForAlgoScratch(activity, isStage, colors),
         xmlClose
     ].join('\n');
 };
