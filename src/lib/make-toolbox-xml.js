@@ -764,7 +764,7 @@ const getAlgoScratchActivity = function () {
     const activity = params.get('activity');
     const mode = params.get('mode');
     if (!activity || mode === 'full') return null;
-    if (!['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-8', 'activite-9', 'activite-10'].includes(activity)) return null;
+    if (!['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-8', 'activite-9', 'activite-10', 'activite-11', 'activite-12', 'activite-13'].includes(activity)) return null;
     return activity;
 };
 
@@ -876,6 +876,18 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
         return `${gotoBlock}`;
     }
 
+    if (activity === 'activite-11') {
+        return `${gotoBlock}${pointBlock}${smallMoveBlock}<block type="motion_ifonedgebounce"/>`;
+    }
+
+    if (activity === 'activite-12') {
+        return `${gotoBlock}<block type="motion_changexby"><value name="DX"><shadow type="math_number"><field name="NUM">5</field></shadow></value></block><block type="motion_changeyby"><value name="DY"><shadow type="math_number"><field name="NUM">5</field></shadow></value></block>`;
+    }
+
+    if (activity === 'activite-13') {
+        return `${gotoBlock}${pointBlock}${smallMoveBlock}`;
+    }
+
     return `${gotoBlock}${pointBlock}${moveBlock}`;
 };
 
@@ -939,18 +951,23 @@ const penBlocksForAlgoScratch = function (activity) {
     return baseBlocks;
 };
 const controlBlocksForAlgoScratch = function (activity) {
-    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : activity === 'activite-7' ? 110 : 10;
-    const repeatBlock = ['activite-4', 'activite-5', 'activite-6', 'activite-7'].includes(activity) ? `
+    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : activity === 'activite-7' ? 110 : activity === 'activite-13' ? 70 : 10;
+    const repeatBlock = ['activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-13'].includes(activity) ? `
         <block type="control_repeat">
             <value name="TIMES">
                 <shadow type="math_whole_number"><field name="NUM">${repeatDefault}</field></shadow>
             </value>
         </block>` : '';
 
-    const foreverBlock = activity === 'activite-8' ? `
+    const foreverBlock = ['activite-8', 'activite-11', 'activite-12'].includes(activity) ? `
         <block type="control_forever"/>` : '';
 
-    return `${repeatBlock}${foreverBlock}
+    const ifBlock = ['activite-11', 'activite-12', 'activite-13'].includes(activity) ? `
+        <block type="control_if"/>` : '';
+    const stopBlock = ['activite-11', 'activite-13'].includes(activity) ? `
+        <block type="control_stop"><field name="STOP_OPTION">all</field></block>` : '';
+
+    return `${repeatBlock}${foreverBlock}${ifBlock}${stopBlock}
         <block type="control_wait">
             <value name="DURATION">
                 <shadow type="math_positive_number"><field name="NUM">1</field></shadow>
@@ -959,7 +976,19 @@ const controlBlocksForAlgoScratch = function (activity) {
 };
 
 const looksBlocksForAlgoScratch = function (activity, isStage) {
-    if (isStage || activity !== 'activite-8') return '';
+    if (isStage) return '';
+    if (activity === 'activite-13') {
+        return `
+    <category name="%{BKY_CATEGORY_LOOKS}" id="looks" colour="#9966FF" secondaryColour="#774DCB">
+        <block type="looks_show"/>
+        <block type="looks_hide"/>
+        <block type="looks_sayforsecs">
+            <value name="MESSAGE"><shadow type="text"><field name="TEXT">c'est gagne !</field></shadow></value>
+            <value name="SECS"><shadow type="math_number"><field name="NUM">2</field></shadow></value>
+        </block>
+    </category>`;
+    }
+    if (activity !== 'activite-8') return '';
     return `
     <category name="%{BKY_CATEGORY_LOOKS}" id="looks" colour="#9966FF" secondaryColour="#774DCB">
         <block type="looks_sayforsecs">
@@ -973,6 +1002,43 @@ const looksBlocksForAlgoScratch = function (activity, isStage) {
     </category>`;
 };
 
+
+const sensingBlocksForAlgoScratch = function (activity, isStage) {
+    if (isStage || !['activite-11', 'activite-12', 'activite-13'].includes(activity)) return '';
+    const touchingRed = `
+        <block type="sensing_touchingcolor">
+            <value name="COLOR"><shadow type="colour_picker"><field name="COLOUR">#e5484d</field></shadow></value>
+        </block>`;
+    const touchingBlue = `
+        <block type="sensing_touchingcolor">
+            <value name="COLOR"><shadow type="colour_picker"><field name="COLOUR">#0057ff</field></shadow></value>
+        </block>`;
+    const touchingBlack = `
+        <block type="sensing_touchingcolor">
+            <value name="COLOR"><shadow type="colour_picker"><field name="COLOUR">#000000</field></shadow></value>
+        </block>`;
+    const keyRight = `
+        <block type="sensing_keypressed">
+            <value name="KEY_OPTION"><shadow type="sensing_keyoptions"><field name="KEY_OPTION">right arrow</field></shadow></value>
+        </block>`;
+    const keyUp = `
+        <block type="sensing_keypressed">
+            <value name="KEY_OPTION"><shadow type="sensing_keyoptions"><field name="KEY_OPTION">up arrow</field></shadow></value>
+        </block>`;
+    const keyDown = `
+        <block type="sensing_keypressed">
+            <value name="KEY_OPTION"><shadow type="sensing_keyoptions"><field name="KEY_OPTION">down arrow</field></shadow></value>
+        </block>`;
+    const keyLeft = `
+        <block type="sensing_keypressed">
+            <value name="KEY_OPTION"><shadow type="sensing_keyoptions"><field name="KEY_OPTION">left arrow</field></shadow></value>
+        </block>`;
+    const mouseDown = '<block type="sensing_mousedown"/>';
+    if (activity === 'activite-11') return touchingRed + touchingBlue;
+    if (activity === 'activite-12') return keyRight + keyLeft + keyUp + keyDown;
+    if (activity === 'activite-13') return mouseDown + touchingBlack;
+    return '';
+};
 
 const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
     const activity = getAlgoScratchActivity();
@@ -993,13 +1059,18 @@ const simpleAlgoScratchToolbox = function (isStage, targetId, colors) {
         ${motionBlocksForAlgoScratch(activity, isStage, stageSelected, targetId)}
     </category>`,
         categorySeparator,
-        `
+        ['activite-11', 'activite-12', 'activite-13'].includes(activity) ? '' : `
     <category name="Stylo" id="pen" colour="${colors.pen.primary}" secondaryColour="${colors.pen.tertiary}">
         ${penBlocksForAlgoScratch(activity)}
     </category>`,
-        categorySeparator,
+        ['activite-11', 'activite-12', 'activite-13'].includes(activity) ? '' : categorySeparator,
         looksBlocksForAlgoScratch(activity, isStage),
         looksBlocksForAlgoScratch(activity, isStage) ? categorySeparator : '',
+        sensingBlocksForAlgoScratch(activity, isStage) ? `
+    <category name="%{BKY_CATEGORY_SENSING}" id="sensing" colour="${colors.sensing.primary}" secondaryColour="${colors.sensing.tertiary}">
+        ${sensingBlocksForAlgoScratch(activity, isStage)}
+    </category>` : '',
+        sensingBlocksForAlgoScratch(activity, isStage) ? categorySeparator : '',
         `
     <category name="%{BKY_CATEGORY_CONTROL}" id="control" colour="${colors.control.primary}" secondaryColour="${colors.control.tertiary}">
         ${controlBlocksForAlgoScratch(activity)}

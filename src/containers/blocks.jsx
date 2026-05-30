@@ -92,7 +92,7 @@ class Blocks extends React.Component {
     ensureAlgoScratchPenExtension () {
         if (typeof window === 'undefined') return;
         const params = new URLSearchParams(window.location.search);
-        if (['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-8', 'activite-9', 'activite-10'].includes(params.get('activity')) && params.get('mode') !== 'full' &&
+        if (['activite-1', 'activite-2', 'activite-3', 'activite-4', 'activite-5', 'activite-6', 'activite-7', 'activite-8', 'activite-9', 'activite-10', 'activite-11', 'activite-12', 'activite-13'].includes(params.get('activity')) && params.get('mode') !== 'full' &&
                 !this.props.vm.extensionManager.isExtensionLoaded('pen')) {
             this.props.vm.extensionManager.loadExtensionIdSync('pen');
         }
