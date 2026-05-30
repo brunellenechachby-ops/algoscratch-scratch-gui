@@ -874,6 +874,7 @@ const penBlocksForAlgoScratch = function (activity) {
     if (activity === 'activite-5') {
         return `${baseBlocks}
         <block type="pen_changePenColorParamBy">
+            <field name="COLOR_PARAM">color</field>
             <value name="VALUE">
                 <shadow type="math_number"><field name="NUM">10</field></shadow>
             </value>
@@ -898,6 +899,7 @@ const penBlocksForAlgoScratch = function (activity) {
             <value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>
         <block type="pen_changePenColorParamBy">
+            <field name="COLOR_PARAM">color</field>
             <value name="VALUE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>`;
     }
@@ -1030,4 +1032,7 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
 };
 
 export default makeToolboxXML;
+
+
+
 
