@@ -784,6 +784,13 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
             </value>
         </block>`;
 
+    const spiralMoveBlock = `
+        <block type="motion_movesteps">
+            <value name="STEPS">
+                <shadow type="math_number"><field name="NUM">6</field></shadow>
+            </value>
+        </block>`;
+
     const smallMoveBlock = `
         <block type="motion_movesteps">
             <value name="STEPS">
@@ -834,6 +841,13 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
             </value>
         </block>`;
 
+    const spiralTurnLeftBlock = `
+        <block type="motion_turnleft">
+            <value name="DEGREES">
+                <shadow type="math_number"><field name="NUM">3</field></shadow>
+            </value>
+        </block>`;
+
     if (activity === 'activite-3') {
         return `${moveBlock}${turnRightBlock}${turnLeftBlock}`;
     }
@@ -851,11 +865,11 @@ const motionBlocksForAlgoScratch = function (activity, isStage, stageSelected, t
     }
 
     if (activity === 'activite-7') {
-        return `${gotoBlock}${moveBlock}${turnLeftBlock}`;
+        return `${gotoBlock}${pointBlock}${spiralMoveBlock}${spiralTurnLeftBlock}`;
     }
 
     if (activity === 'activite-8') {
-        return `${mouseGotoBlock}${xPositionBlock}${yPositionBlock}`;
+        return `${gotoBlock}${pointBlock}${mouseGotoBlock}${xPositionBlock}${yPositionBlock}`;
     }
 
     if (activity === 'activite-9' || activity === 'activite-10') {
@@ -871,14 +885,19 @@ const penBlocksForAlgoScratch = function (activity) {
         <block type="pen_penDown"/>
         <block type="pen_penUp"/>`;
 
-    if (activity === 'activite-5') {
-        return `${baseBlocks}
+    const setPenSizeFiveBlock = `
+        <block type="pen_setPenSizeTo">
+            <value name="SIZE"><shadow type="math_number"><field name="NUM">5</field></shadow></value>
+        </block>`;
+
+    const addColorTenBlock = `
         <block type="pen_changePenColorParamBy">
             <field name="COLOR_PARAM">color</field>
-            <value name="VALUE">
-                <shadow type="math_number"><field name="NUM">10</field></shadow>
-            </value>
+            <value name="VALUE"><shadow type="math_number"><field name="NUM">10</field></shadow></value>
         </block>`;
+
+    if (activity === 'activite-5') {
+        return `${baseBlocks}${addColorTenBlock}`;
     }
 
     if (activity === 'activite-6') {
@@ -895,6 +914,11 @@ const penBlocksForAlgoScratch = function (activity) {
         <block type="pen_setPenSizeTo">
             <value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>
+        <block type="pen_setPenColorToColor">
+            <value name="COLOR">
+                <shadow type="colour_picker"><field name="COLOUR">#0057ff</field></shadow>
+            </value>
+        </block>
         <block type="pen_changePenSizeBy">
             <value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>
@@ -904,11 +928,18 @@ const penBlocksForAlgoScratch = function (activity) {
         </block>`;
     }
 
+    if (activity === 'activite-8') {
+        return `${baseBlocks}${addColorTenBlock}`;
+    }
+
+    if (activity === 'activite-9' || activity === 'activite-10') {
+        return `${baseBlocks}${setPenSizeFiveBlock}`;
+    }
+
     return baseBlocks;
 };
-
 const controlBlocksForAlgoScratch = function (activity) {
-    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : activity === 'activite-7' ? 80 : 10;
+    const repeatDefault = activity === 'activite-5' ? 8 : activity === 'activite-6' ? 3 : activity === 'activite-7' ? 110 : 10;
     const repeatBlock = ['activite-4', 'activite-5', 'activite-6', 'activite-7'].includes(activity) ? `
         <block type="control_repeat">
             <value name="TIMES">
@@ -935,7 +966,7 @@ const looksBlocksForAlgoScratch = function (activity, isStage) {
             <value name="MESSAGE"><shadow type="text"><field name="TEXT">abscisse x</field></shadow></value>
             <value name="SECS"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>
-        <block type="looks_sayforsecs">
+        <block type="looks_thinkforsecs">
             <value name="MESSAGE"><shadow type="text"><field name="TEXT">ordonnee y</field></shadow></value>
             <value name="SECS"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         </block>
@@ -1032,6 +1063,8 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
 };
 
 export default makeToolboxXML;
+
+
 
 
 
